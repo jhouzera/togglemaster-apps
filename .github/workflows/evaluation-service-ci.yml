@@ -46,8 +46,6 @@ jobs:
       service-name: evaluation-service
       service-dockerfile: app/evaluation-service/Dockerfile
       service-path: app/evaluation-service
-      aws-region: ${{ vars.AWS_REGION }}
-      role-to-assume: ""
       image-tag: pr-${{ github.event.pull_request.number }}
       push-images: false
 
@@ -59,8 +57,6 @@ jobs:
       service-name: evaluation-service
       service-dockerfile: app/evaluation-service/Dockerfile
       service-path: app/evaluation-service
-      aws-region: ${{ vars.AWS_REGION }}
-      role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME_DEV }}
       ecr-repository-prefix: togglemaster-dev
       image-tag: v0.${{ github.run_number }}.0
       push-images: true
