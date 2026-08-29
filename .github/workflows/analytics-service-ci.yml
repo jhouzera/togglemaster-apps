@@ -65,7 +65,7 @@ jobs:
   promote-dev:
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@b16d2601a6b948e2fb26f3772276581f31daa7cd
     with:
       service-name: analytics-service
       gitops-values-file: environments/dev/apps/analytics-values.yaml
