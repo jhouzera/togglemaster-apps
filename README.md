@@ -30,7 +30,7 @@ Dependencias externas:
 - Consome infraestrutura criada pelo `togglemaster-iac`.
 - Publica imagens no ECR seguindo o prefixo `togglemaster-dev/*`.
 - A promocao para o cluster e feita pelo ArgoCD Image Updater.
-- A variable `AWS_ROLE_TO_ASSUME_DEV` deve apontar para o output `ecr_role_arns["dev"]` do
+- A variable `AWS_ROLE_TO_ASSUME` deve apontar para o output `ecr_role_arns["dev"]` do
 	bootstrap de IAM.
 - Os secrets de runtime devem seguir o padrao `togglemaster-dev/app/<secret-name>` no AWS Secrets Manager.
 
