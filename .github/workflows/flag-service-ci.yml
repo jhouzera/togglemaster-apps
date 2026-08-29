@@ -12,6 +12,11 @@ on:
       - app/flag-service/**
       - .github/workflows/flag-service-ci.yml
 
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+
 concurrency:
   group: devsecops-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

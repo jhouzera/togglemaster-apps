@@ -12,6 +12,11 @@ on:
       - app/auth-service/**
       - .github/workflows/auth-service-ci.yml
 
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+
 concurrency:
   group: devsecops-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
