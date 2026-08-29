@@ -64,5 +64,6 @@ jobs:
       ecr-repository-prefix: togglemaster-dev
       image-tag: v0.${{ github.run_number }}.0
       push-images: true
+      environment: dev
 
 
