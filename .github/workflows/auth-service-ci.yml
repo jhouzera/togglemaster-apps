@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   validate:
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
     with:
       service-name: auth-service
       service-language: go
@@ -31,17 +31,18 @@ jobs:
 
   security:
     needs: validate
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
     with:
       service-name: auth-service
       service-language: go
       service-path: app/auth-service
-    secrets: inherit
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   image-pr:
     needs: security
     if: github.event_name == 'pull_request'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
     with:
       service-name: auth-service
       service-dockerfile: app/auth-service/Dockerfile
@@ -52,7 +53,7 @@ jobs:
   image-dev:
     needs: security
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
     with:
       service-name: auth-service
       service-dockerfile: app/auth-service/Dockerfile
@@ -65,13 +66,15 @@ jobs:
   promote-dev:
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
     with:
       service-name: auth-service
       gitops-values-file: environments/dev/apps/auth-values.yaml
       image-repository: ${{ needs.image-dev.outputs.image-repository }}
       image-tag: ${{ needs.image-dev.outputs.image-tag }}
       image-digest: ${{ needs.image-dev.outputs.image-digest }}
-    secrets: inherit
+    secrets:
+      GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
+      GITOPS_REPO: ${{ secrets.GITOPS_REPO }}
 
 
