@@ -40,4 +40,3 @@ Para publicar uma versao, crie uma tag semantica apontando para o commit desejad
 git tag v1.0.0
 git push origin v1.0.0
 ```
-
