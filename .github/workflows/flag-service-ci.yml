@@ -12,6 +12,11 @@ on:
       - app/flag-service/**
       - .github/workflows/flag-service-ci.yml
 
+permissions:
+  contents: read
+  id-token: write
+  security-events: write
+
 concurrency:
   group: devsecops-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -41,8 +46,6 @@ jobs:
       service-name: flag-service
       service-dockerfile: app/flag-service/Dockerfile
       service-path: app/flag-service
-      aws-region: us-east-1
-      role-to-assume: ""
       image-tag: pr-${{ github.event.pull_request.number }}
       push-images: false
 
@@ -54,9 +57,8 @@ jobs:
       service-name: flag-service
       service-dockerfile: app/flag-service/Dockerfile
       service-path: app/flag-service
-      aws-region: us-east-1
-      role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME_DEV }}
       ecr-repository-prefix: togglemaster-dev
       image-tag: v0.${{ github.run_number }}.0
       push-images: true
+      environment: dev
 
