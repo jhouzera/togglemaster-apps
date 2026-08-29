@@ -1,0 +1,62 @@
+name: targeting-service-ci
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - app/targeting-service/**
+      - .github/workflows/targeting-service-ci.yml
+  pull_request:
+    paths:
+      - app/targeting-service/**
+      - .github/workflows/targeting-service-ci.yml
+
+concurrency:
+  group: devsecops-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@main
+    with:
+      service-name: targeting-service
+      service-language: python
+      service-path: app/targeting-service
+
+  security:
+    needs: validate
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@main
+    with:
+      service-name: targeting-service
+      service-language: python
+      service-path: app/targeting-service
+    secrets: inherit
+
+  image-pr:
+    needs: security
+    if: github.event_name == 'pull_request'
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@main
+    with:
+      service-name: targeting-service
+      service-dockerfile: app/targeting-service/Dockerfile
+      service-path: app/targeting-service
+      aws-region: us-east-1
+      role-to-assume: ""
+      image-tag: pr-${{ github.event.pull_request.number }}
+      push-images: false
+
+  image-dev:
+    needs: security
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@main
+    with:
+      service-name: targeting-service
+      service-dockerfile: app/targeting-service/Dockerfile
+      service-path: app/targeting-service
+      aws-region: us-east-1
+      role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME_DEV }}
+      ecr-repository-prefix: togglemaster-dev
+      image-tag: v0.${{ github.run_number }}.0
+      push-images: true
+
