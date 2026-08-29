@@ -60,7 +60,7 @@ jobs:
       service-dockerfile: app/targeting-service/Dockerfile
       service-path: app/targeting-service
       aws-region: us-east-1
-      role-to-assume: ${{ vars.AWS_ROLE_TO_ASSUME_DEV }}
+      role-to-assume: arn:aws:iam::927738510198:role/togglemaster-dev-github-actions-ecr-role
       ecr-repository-prefix: togglemaster-dev
       image-tag: v0.${{ github.run_number }}.0
       push-images: true
