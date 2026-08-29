@@ -6,8 +6,8 @@
 - [ ] Confirmar que os wrappers encadeiam `validate`, `security` e `image` com `needs`.
 
 ## 2. Secrets obrigatorios no repositório
-Em `Settings > Secrets and variables > Actions > Secrets`:
-- [ ] `AWS_ROLE_TO_ASSUME_DEV` definido com a role ECR do ambiente `dev`.
+Em `Settings > Environments > dev > Environment variables`:
+- [ ] `AWS_ROLE_TO_ASSUME` e `AWS_REGION` definidos como variáveis de ambiente no Environment `dev`.
 
 ## 3. Secret opcional recomendado
 - [ ] `SONAR_TOKEN` definido para habilitar análise no SonarCloud.
