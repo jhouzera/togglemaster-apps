@@ -62,3 +62,15 @@ jobs:
       push-images: true
       environment: dev
 
+  promote-dev:
+    needs: image-dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@main
+    with:
+      service-name: evaluation-service
+      gitops-values-file: environments/dev/apps/evaluation-values.yaml
+      image-repository: ${{ needs.image-dev.outputs.image-repository }}
+      image-tag: ${{ needs.image-dev.outputs.image-tag }}
+      image-digest: ${{ needs.image-dev.outputs.image-digest }}
+    secrets: inherit
+
