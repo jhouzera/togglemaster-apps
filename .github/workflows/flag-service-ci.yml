@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   validate:
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: flag-service
       service-language: python
@@ -31,7 +31,7 @@ jobs:
 
   security:
     needs: validate
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: flag-service
       service-language: python
@@ -42,7 +42,7 @@ jobs:
   image-pr:
     needs: security
     if: github.event_name == 'pull_request'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: flag-service
       service-dockerfile: app/flag-service/Dockerfile
@@ -53,7 +53,7 @@ jobs:
   image-dev:
     needs: security
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: flag-service
       service-dockerfile: app/flag-service/Dockerfile
@@ -66,10 +66,11 @@ jobs:
   promote-dev:
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@f2e7727feb345648f788f4e927d4bcb59ff8ec16
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: flag-service
       gitops-values-file: environments/dev/apps/flag-values.yaml
+      gitops-repo: jhouzera/togglemaster-gitops
       image-repository: ${{ needs.image-dev.outputs.image-repository }}
       image-tag: ${{ needs.image-dev.outputs.image-tag }}
       image-digest: ${{ needs.image-dev.outputs.image-digest }}
