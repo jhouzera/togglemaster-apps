@@ -70,6 +70,7 @@ jobs:
     with:
       service-name: auth-service
       gitops-values-file: environments/dev/apps/auth-values.yaml
+      gitops-repo: jhouzera/togglemaster-gitops
       image-repository: ${{ needs.image-dev.outputs.image-repository }}
       image-tag: ${{ needs.image-dev.outputs.image-tag }}
       image-digest: ${{ needs.image-dev.outputs.image-digest }}
