@@ -12,6 +12,6 @@ permissions:
 
 jobs:
   auto-pr:
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/auto-pr.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/auto-pr.yml@1c959936aa809bf82e34f93845a3edaa22de5cc5
     with:
       target-branch: develop

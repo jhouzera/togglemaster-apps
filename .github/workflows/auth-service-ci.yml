@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   validate:
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1c959936aa809bf82e34f93845a3edaa22de5cc5
     with:
       service-name: auth-service
       service-language: go
@@ -32,7 +32,7 @@ jobs:
 
   security:
     needs: validate
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@1c959936aa809bf82e34f93845a3edaa22de5cc5
     with:
       service-name: auth-service
       service-language: go
@@ -43,7 +43,7 @@ jobs:
   image-pr:
     needs: security
     if: github.event_name == 'pull_request'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1c959936aa809bf82e34f93845a3edaa22de5cc5
     with:
       service-name: auth-service
       service-dockerfile: app/auth-service/Dockerfile
@@ -54,7 +54,7 @@ jobs:
   image-dev:
     needs: security
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1c959936aa809bf82e34f93845a3edaa22de5cc5
     with:
       service-name: auth-service
       service-dockerfile: app/auth-service/Dockerfile
@@ -67,7 +67,7 @@ jobs:
   promote-dev:
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@1c959936aa809bf82e34f93845a3edaa22de5cc5
     with:
       service-name: auth-service
       gitops-values-file: environments/dev/apps/auth-values.yaml
