@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   validate:
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@f661804cf0718cadc51fff9fe6dad81e63529b43
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: evaluation-service
       service-language: go
@@ -32,7 +32,7 @@ jobs:
 
   security:
     needs: validate
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@f661804cf0718cadc51fff9fe6dad81e63529b43
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: evaluation-service
       service-language: go
@@ -43,7 +43,7 @@ jobs:
   image-pr:
     needs: security
     if: github.event_name == 'pull_request'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f661804cf0718cadc51fff9fe6dad81e63529b43
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: evaluation-service
       service-dockerfile: app/evaluation-service/Dockerfile
@@ -54,7 +54,7 @@ jobs:
   image-dev:
     needs: security
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f661804cf0718cadc51fff9fe6dad81e63529b43
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: evaluation-service
       service-dockerfile: app/evaluation-service/Dockerfile
@@ -67,7 +67,7 @@ jobs:
   promote-dev:
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@f661804cf0718cadc51fff9fe6dad81e63529b43
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: evaluation-service
       gitops-values-file: environments/dev/apps/evaluation-values.yaml
