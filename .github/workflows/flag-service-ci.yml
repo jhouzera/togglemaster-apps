@@ -3,7 +3,7 @@ name: flag-service-ci
 on:
   push:
     branches:
-      - develop
+      - main
     paths:
       - app/flag-service/**
       - .github/workflows/flag-service-ci.yml
@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   validate:
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: flag-service
       service-language: python
@@ -31,17 +31,18 @@ jobs:
 
   security:
     needs: validate
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: flag-service
       service-language: python
       service-path: app/flag-service
-    secrets: inherit
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   image-pr:
     needs: security
     if: github.event_name == 'pull_request'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@main
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: flag-service
       service-dockerfile: app/flag-service/Dockerfile
@@ -51,8 +52,8 @@ jobs:
 
   image-dev:
     needs: security
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: flag-service
       service-dockerfile: app/flag-service/Dockerfile
@@ -61,4 +62,19 @@ jobs:
       image-tag: v0.${{ github.run_number }}.0
       push-images: true
       environment: dev
+
+  promote-dev:
+    needs: image-dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.image-dev.result == 'success'
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@1b2363c696638110ad28641f217631dac79e50a1
+    with:
+      service-name: flag-service
+      gitops-values-file: environments/dev/apps/flag-values.yaml
+      gitops-repo: jhouzera/togglemaster-gitops
+      image-repository: ${{ needs.image-dev.outputs.image-repository }}
+      image-tag: ${{ needs.image-dev.outputs.image-tag }}
+      image-digest: ${{ needs.image-dev.outputs.image-digest }}
+    secrets:
+      GITOPS_TOKEN: ${{ secrets.GITOPS_TOKEN }}
+      GITOPS_REPO: ${{ secrets.GITOPS_REPO }}
 

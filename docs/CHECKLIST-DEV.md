@@ -6,8 +6,8 @@
 - [ ] Confirmar que os wrappers encadeiam `validate`, `security` e `image` com `needs`.
 
 ## 2. Secrets obrigatorios no repositório
-Em `Settings > Secrets and variables > Actions > Secrets`:
-- [ ] `AWS_ROLE_TO_ASSUME_DEV` definido com a role ECR do ambiente `dev`.
+Em `Settings > Environments > dev > Environment variables`:
+- [ ] `AWS_ROLE_TO_ASSUME` e `AWS_REGION` definidos como variáveis de ambiente no Environment `dev`.
 
 ## 3. Secret opcional recomendado
 - [ ] `SONAR_TOKEN` definido para habilitar análise no SonarCloud.
@@ -44,23 +44,24 @@ Em `Settings > Branches > main`:
 - [ ] Confirmar etapas de build, test, lint, SCA e SAST.
 - [ ] Confirmar que vulnerabilidade `CRITICAL` bloqueia o pipeline.
 
-## 9. Validacao na branch main
-- [ ] Fazer merge de PR aprovado na `main`.
+## 9. Validacao na branch develop
+- [ ] Fazer merge de PR aprovado na `develop`.
 - [ ] Confirmar build da imagem Docker do microsservico alterado.
 - [ ] Confirmar scan de imagem com Trivy.
 - [ ] Confirmar push para ECR com tag semver `vMAJOR.MINOR.PATCH`.
-- [ ] Confirmar update do `values.yaml` pelo ArgoCD Image Updater.
+- [ ] Confirmar a criacao do Pull Request de promocao no `togglemaster-gitops`.
+- [ ] Confirmar tag e digest no values em `environments/dev/apps/`.
 - [ ] Confirmar sincronizacao automatica no ArgoCD.
 
 ## 10. Troubleshooting rapido
 - [ ] Falha de OIDC: revisar trust policy da role e ref do workflow.
 - [ ] Falha de push ECR: revisar policy anexada na role de build.
-- [ ] Falha na promocao GitOps: revisar `argocd/git-creds`, annotations, role IRSA e protecao
-	de branch.
+- [ ] Falha na promocao GitOps: revisar `GITOPS_TOKEN`, `GITOPS_REPO`, o Pull Request e a protecao
+	de branch do repositorio GitOps.
 - [ ] Falha em segurança: revisar saída do Trivy, gosec ou bandit e corrigir o código.
 
 ## 11. Criterio de pronto
-- [ ] Os 5 workflows por microsservico executam em PR e `main`.
+- [ ] Os 5 workflows por microsservico executam em PR e `develop`.
 - [ ] Build e push no ECR funcionando para qualquer microsservico alterado.
-- [ ] Atualizacao automatica do arquivo de values do microsservico no `togglemaster-gitops`.
-- [ ] ArgoCD sincroniza a nova tag da imagem automaticamente no `dev`.
+- [ ] Pull Request de promocao atualiza o arquivo de values no `togglemaster-gitops`.
+- [ ] ArgoCD sincroniza a imagem por digest automaticamente no `dev`.
