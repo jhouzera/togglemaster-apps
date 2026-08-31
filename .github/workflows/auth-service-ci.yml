@@ -3,7 +3,6 @@ name: auth-service-ci
 on:
   push:
     branches:
-      - develop
       - main
     paths:
       - app/auth-service/**
@@ -53,7 +52,7 @@ jobs:
 
   image-dev:
     needs: security
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: auth-service
@@ -66,7 +65,7 @@ jobs:
 
   promote-dev:
     needs: image-dev
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.image-dev.result == 'success'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: auth-service
