@@ -59,6 +59,7 @@ jobs:
   image-pr:
     permissions:
       contents: read
+      id-token: write
     needs: security
     if: github.event_name == 'pull_request'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
