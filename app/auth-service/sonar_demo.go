@@ -1,1 +1,0 @@
-const sonarDemoPassword = "demo-password-do-not-use"
