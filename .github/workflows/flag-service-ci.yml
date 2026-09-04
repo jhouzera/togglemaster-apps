@@ -76,7 +76,7 @@ jobs:
       id-token: write
     needs: security
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: flag-service
       service-dockerfile: app/flag-service/Dockerfile
@@ -91,7 +91,7 @@ jobs:
       contents: read
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.image-dev.result == 'success'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@1b2363c696638110ad28641f217631dac79e50a1
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: flag-service
       gitops-values-file: environments/dev/apps/flag-values.yaml

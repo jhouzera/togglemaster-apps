@@ -21,7 +21,7 @@ func main() {
 	// Carrega o .env para desenvolvimento local. Em produção, isso não fará nada.
 	_ = godotenv.Load()
 
-	// --- Configuração ---
+	// ---- Configuração ----
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8001" // Porta padrão
@@ -37,7 +37,7 @@ func main() {
 		log.Fatal("MASTER_KEY deve ser definida")
 	}
 
-	// --- Conexão com o Banco ---
+	// ---- Conexão com o Banco ----
 	db, err := connectDB(databaseURL)
 	if err != nil {
 		log.Fatalf("Não foi possível conectar ao banco de dados: %v", err)
@@ -53,7 +53,7 @@ func main() {
 		MasterKey: masterKey,
 	}
 
-	// --- Rotas da API ---
+	// ---- Rotas da API ----
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", app.healthHandler)
 
