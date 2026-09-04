@@ -37,7 +37,7 @@ jobs:
       contents: read
     needs: detect-changes
     if: github.event_name == 'pull_request' && needs.detect-changes.outputs.should_run == 'true'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1b2363c696638110ad28641f217631dac79e50a1
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@f2fd28e16c3dab1958ba25f42fb6bd3c78e7ea8a
     with:
       service-name: analytics-service
       service-language: python
@@ -48,7 +48,7 @@ jobs:
       contents: read
       security-events: write
     needs: validate
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@1b2363c696638110ad28641f217631dac79e50a1
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@f2fd28e16c3dab1958ba25f42fb6bd3c78e7ea8a
     with:
       service-name: analytics-service
       service-language: python
@@ -62,7 +62,7 @@ jobs:
       id-token: write
     needs: security
     if: github.event_name == 'pull_request'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f2fd28e16c3dab1958ba25f42fb6bd3c78e7ea8a
     with:
       service-name: analytics-service
       service-dockerfile: app/analytics-service/Dockerfile
@@ -76,7 +76,7 @@ jobs:
       id-token: write
     needs: detect-changes
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@f2fd28e16c3dab1958ba25f42fb6bd3c78e7ea8a
     with:
       service-name: analytics-service
       service-dockerfile: app/analytics-service/Dockerfile
@@ -91,7 +91,7 @@ jobs:
       contents: read
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.image-dev.result == 'success'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@f2fd28e16c3dab1958ba25f42fb6bd3c78e7ea8a
     with:
       service-name: analytics-service
       gitops-values-file: environments/dev/apps/analytics-values.yaml
