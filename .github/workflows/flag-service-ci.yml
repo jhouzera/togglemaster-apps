@@ -8,21 +8,35 @@ on:
       - app/flag-service/**
       - .github/workflows/flag-service-ci.yml
   pull_request:
-    paths:
-      - app/flag-service/**
-      - .github/workflows/flag-service-ci.yml
-
-permissions:
-  contents: read
-  id-token: write
-  security-events: write
+    # Paths removido. O filtro é feito pelo job 'detect-changes'.
 
 concurrency:
   group: devsecops-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3
+        id: filter
+        with:
+          filters: |
+            should_run:
+              - 'app/flag-service/**'
+              - '.github/workflows/flag-service-ci.yml'
+
   validate:
+    permissions:
+      contents: read
+    needs: detect-changes
+    if: github.event_name != 'pull_request' || needs.detect-changes.outputs.should_run == 'true'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: flag-service
@@ -30,6 +44,9 @@ jobs:
       service-path: app/flag-service
 
   security:
+    permissions:
+      contents: read
+      security-events: write
     needs: validate
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
@@ -40,6 +57,9 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   image-pr:
+    permissions:
+      contents: read
+      id-token: write
     needs: security
     if: github.event_name == 'pull_request'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
@@ -51,6 +71,9 @@ jobs:
       push-images: false
 
   image-dev:
+    permissions:
+      contents: read
+      id-token: write
     needs: security
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
@@ -64,6 +87,8 @@ jobs:
       environment: dev
 
   promote-dev:
+    permissions:
+      contents: read
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.image-dev.result == 'success'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@1b2363c696638110ad28641f217631dac79e50a1
