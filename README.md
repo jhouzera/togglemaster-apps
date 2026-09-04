@@ -34,5 +34,3 @@ Dependencias externas:
 - Os secrets de runtime devem seguir o padrao `togglemaster-dev/app/<secret-name>` no AWS Secrets Manager.
 
 Um push aprovado em `develop` publica a imagem e cria a proposta de promocao no GitOps.
-
-teste
