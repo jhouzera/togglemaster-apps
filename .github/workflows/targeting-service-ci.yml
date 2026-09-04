@@ -8,30 +8,47 @@ on:
       - app/targeting-service/**
       - .github/workflows/targeting-service-ci.yml
   pull_request:
-    paths:
-      - app/targeting-service/**
-      - .github/workflows/targeting-service-ci.yml
-
-permissions:
-  contents: read
-  id-token: write
-  security-events: write
+    # Paths removido. O filtro é feito pelo job 'detect-changes'.
 
 concurrency:
   group: devsecops-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3
+        id: filter
+        with:
+          filters: |
+            should_run:
+              - 'app/targeting-service/**'
+              - '.github/workflows/targeting-service-ci.yml'
+
   validate:
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    permissions:
+      contents: read
+    needs: detect-changes
+    if: github.event_name != 'pull_request' || needs.detect-changes.outputs.should_run == 'true'
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: targeting-service
       service-language: python
       service-path: app/targeting-service
 
   security:
+    permissions:
+      contents: read
+      security-events: write
     needs: validate
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/security.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: targeting-service
       service-language: python
@@ -40,9 +57,12 @@ jobs:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   image-pr:
+    permissions:
+      contents: read
+      id-token: write
     needs: security
     if: github.event_name == 'pull_request'
-    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
+    uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: targeting-service
       service-dockerfile: app/targeting-service/Dockerfile
@@ -51,6 +71,9 @@ jobs:
       push-images: false
 
   image-dev:
+    permissions:
+      contents: read
+      id-token: write
     needs: security
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
@@ -64,6 +87,8 @@ jobs:
       environment: dev
 
   promote-dev:
+    permissions:
+      contents: read
     needs: image-dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.image-dev.result == 'success'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@d35c49c659844bdfa952844acfc699bcf525b97c
