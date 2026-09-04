@@ -36,7 +36,7 @@ jobs:
     permissions:
       contents: read
     needs: detect-changes
-    if: github.event_name != 'pull_request' || needs.detect-changes.outputs.should_run == 'true'
+    if: github.event_name == 'pull_request' && needs.detect-changes.outputs.should_run == 'true'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: evaluation-service
@@ -74,7 +74,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    needs: security
+    needs: detect-changes
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
