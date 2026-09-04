@@ -35,3 +35,4 @@ Dependencias externas:
 
 Um push aprovado em `develop` publica a imagem e cria a proposta de promocao no GitOps.
 
+teste
