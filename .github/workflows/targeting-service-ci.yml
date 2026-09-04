@@ -3,7 +3,7 @@ name: targeting-service-ci
 on:
   push:
     branches:
-      - develop
+      - main
     paths:
       - app/targeting-service/**
       - .github/workflows/targeting-service-ci.yml
@@ -52,7 +52,7 @@ jobs:
 
   image-dev:
     needs: security
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/image.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: targeting-service
@@ -65,7 +65,7 @@ jobs:
 
   promote-dev:
     needs: image-dev
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop' && needs.image-dev.result == 'success'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.image-dev.result == 'success'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/update-gitops.yml@d35c49c659844bdfa952844acfc699bcf525b97c
     with:
       service-name: targeting-service
