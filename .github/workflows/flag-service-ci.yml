@@ -8,9 +8,7 @@ on:
       - app/flag-service/**
       - .github/workflows/flag-service-ci.yml
   pull_request:
-    paths:
-      - app/flag-service/**
-      - .github/workflows/flag-service-ci.yml
+    # Paths removido. O filtro é feito pelo job 'detect-changes'.
 
 permissions:
   contents: read
@@ -22,7 +20,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            should_run:
+              - 'app/flag-service/**'
+              - '.github/workflows/flag-service-ci.yml'
+
   validate:
+    needs: detect-changes
+    if: github.event_name != 'pull_request' || needs.detect-changes.outputs.should_run == 'true'
     uses: jhouzera/togglemaster-cicd-templates/.github/workflows/validate.yml@1b2363c696638110ad28641f217631dac79e50a1
     with:
       service-name: flag-service
