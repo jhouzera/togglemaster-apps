@@ -30,7 +30,7 @@ type App struct {
 func main() {
 	_ = godotenv.Load() // Carrega .env para dev local
 
-	// --- Configuração ---
+	// ---- Configuração ---
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8004"
@@ -61,7 +61,7 @@ func main() {
 		log.Fatal("AWS_REGION deve ser definida para usar SQS")
 	}
 
-	// --- Inicializa Clientes ---
+	// ---- Inicializa Clientes ---
 
 	// Cliente Redis
 	opt, err := redis.ParseURL(redisURL)
@@ -106,7 +106,7 @@ func main() {
 		TargetingServiceURL: targetingSvcURL,
 	}
 
-	// --- Rotas ---
+	// ---- Rotas ---
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", app.healthHandler)
 	mux.HandleFunc("/evaluate", app.evaluationHandler)
