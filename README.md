@@ -1,36 +1,33 @@
 # togglemaster-apps
 
-Repositorio dedicado ao codigo-fonte dos microsservicos ToggleMaster.
+Repositório *monorepo* dedicado ao código-fonte dos microsserviços da plataforma ToggleMaster.
 
-Proposito:
-- Concentrar exclusivamente o ciclo de desenvolvimento e integracao continua dos microsservicos.
-- Publicar imagens versionadas no ECR.
-- Promover imagens do ambiente `dev` por Pull Request no repositorio GitOps.
+## 🎯 Propósito
+Concentrar exclusivamente o ciclo de desenvolvimento, testes, análise de segurança e integração contínua (CI) dos microsserviços (Auth, Flag, Targeting, Evaluation, Analytics).
 
-Responsabilidades:
-- Codigo das APIs auth, flag, targeting, evaluation e analytics.
-- Dockerfiles por servico.
-- Workflows adaptadores por microsservico, responsáveis somente por gatilhos e parâmetros.
+## 🚀 Como Utilizar
 
-Pipeline DevSecOps:
-- O workflow reutilizável é mantido no repositório `togglemaster-cicd-templates`.
-- Pipeline multiestágio com validação, segurança e imagem.
-- Pipeline com build, teste, lint, Trivy, gosec, bandit e SonarCloud opcional.
-- Push de imagens para o Amazon ECR em commits na branch `develop`, usando tags semver geradas pelo workflow.
-- Apos o push, o workflow coleta o digest imutavel e abre um Pull Request que atualiza o values dedicado no repositorio GitOps.
-- O job de promocao usa `GITOPS_TOKEN` e `GITOPS_REPO` somente para criar o Pull Request no GitOps.
-- O catálogo é referenciado por `@main` até a publicação da primeira tag estável `v1`.
-- Checklist operacional no ambiente dev: `docs/CHECKLIST-DEV.md`.
-- Runbook operacional no ambiente dev: `docs/RUNBOOK-DEV.md`.
+Cada pasta dentro de `app/` é um serviço Python independente. O CI do repositório é otimizado com a ferramenta `dorny/paths-filter`, que garante que **apenas o serviço que teve o código modificado** acione o fluxo completo de testes e build, pulando os demais serviços para economizar recursos e tempo.
 
-Este repositorio nao deve conter manifests de deploy nem infraestrutura AWS.
+Ao realizar um *merge* para a branch `main`, o GitHub Actions executa o build da imagem Docker, faz o *push* para o Amazon ECR, e em seguida **abre um Pull Request automatizado no repositório `togglemaster-gitops`** para promover a versão no cluster.
 
-Dependencias externas:
-- Consome infraestrutura criada pelo `togglemaster-iac`.
-- Publica imagens no ECR seguindo o prefixo `togglemaster-dev/*`.
-- A promocao para o cluster e declarada no GitOps e reconciliada pelo ArgoCD.
-- As variáveis `AWS_ROLE_TO_ASSUME` e `AWS_REGION` devem ser criadas dentro do GitHub Environment (ex: `dev`) e apontar para o output `ecr_role_arns["dev"]` do
-	bootstrap de IAM.
-- Os secrets de runtime devem seguir o padrao `togglemaster-dev/app/<secret-name>` no AWS Secrets Manager.
+### Exemplo Simples (Execução Local)
 
-Um push aprovado em `develop` publica a imagem e cria a proposta de promocao no GitOps.
+```bash
+# Navegue até o serviço
+cd app/auth-service
+
+# Crie um ambiente virtual (recomendado)
+python3 -m venv venv && source venv/bin/activate
+
+# Instale as dependências
+pip install -r requirements.txt
+pip install -r requirements-test.txt
+
+# Execute os testes unitários
+pytest
+```
+
+## 🔐 Segurança e Boas Práticas
+- **Zero Segredos no Código:** Nenhum *secret* ou senha é *hardcoded*. A plataforma adota a injeção via variáveis de ambiente no Kubernetes que são resgatadas dinamicamente do AWS Secrets Manager.
+- Todos os *Pull Requests* passam por um **Quality Gate** via SonarQube e Trivy antes do *merge*.
