@@ -5,6 +5,13 @@ Repositório *monorepo* dedicado ao código-fonte dos microsserviços da platafo
 ## 🎯 Propósito
 Concentrar exclusivamente o ciclo de desenvolvimento, testes, análise de segurança e integração contínua (CI) dos microsserviços (Auth, Flag, Targeting, Evaluation, Analytics).
 
+## ⚙️ Como Funciona
+Por ser um *monorepo*, a inteligência da CI/CD se concentra na detecção de alterações. Quando um desenvolvedor abre um Pull Request, a ferramenta `dorny/paths-filter` compara a árvore de diretórios do Git e descobre qual microsserviço foi alterado.
+1. **Validação**: Roda testes (Pytest) e Linting no serviço modificado.
+2. **Segurança**: Envia relatórios estáticos para o SonarQube e verifica vulnerabilidades.
+3. **Build e OIDC**: Ao realizar o merge na branch `main`, o GitHub Actions utiliza um *Token OIDC* efêmero para se autenticar no AWS IAM (sem senhas de longa duração), faz o *push* da imagem Docker para o Amazon ECR.
+4. **Promoção (GitOps)**: Um bot clona o repositório `togglemaster-gitops`, atualiza o arquivo `.yaml` com a nova *tag* (ex: `v0.12.0`), e abre um Pull Request automatizado, entregando o bastão da implantação (Delivery) para o ArgoCD.
+
 ## 🚀 Como Utilizar
 
 Cada pasta dentro de `app/` é um serviço Python independente. O CI do repositório é otimizado com a ferramenta `dorny/paths-filter`, que garante que **apenas o serviço que teve o código modificado** acione o fluxo completo de testes e build, pulando os demais serviços para economizar recursos e tempo.
