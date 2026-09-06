@@ -1,3 +1,7 @@
 package main
 
-const sonarDemoPassword = "demo-password-do-not-use"
+import "crypto/md5"
+
+func insecureDemoHash(value string) [md5.Size]byte {
+	return md5.Sum([]byte(value))
+}
